@@ -1,12 +1,15 @@
 import os
+import google.generativeai as genai
 from flask import Flask, request, jsonify, render_template_string
-from google import genai
 
 app = Flask(__name__)
 
-# Official Gemini Client Setup
+# Aapki AQ. se shuru hone wali valid API Key yahan hai
 API_KEY = "AQ.Ab8RN6K_wQ1QjWZuBKxYWNRRe3rCWZPicC43b0xjWHMoSfa7hw"
-client = genai.Client(api_key=API_KEY)
+genai.configure(api_key=API_KEY)
+
+# Model setup
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 HTML_LAYOUT = """
 <!DOCTYPE html>
@@ -202,10 +205,7 @@ def chat():
     user_prompt = data.get('prompt', '')
     
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=user_prompt,
-        )
+        response = model.generate_content(user_prompt)
         reply = response.text
     except Exception as e:
         reply = f"API Error: {str(e)}"
