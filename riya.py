@@ -14,6 +14,10 @@ HTML_LAYOUT = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Riya AI Assistant</title>
+    <!-- Google Bubble Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
         html, body {
@@ -22,26 +26,29 @@ HTML_LAYOUT = """
             overflow: hidden;
             background: #000 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000') no-repeat center center fixed;
             background-size: cover;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
             color: white;
         }
         .overlay {
             background: rgba(0, 0, 0, 0.65);
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: 100dvh;
             width: 100vw;
         }
         .header {
-            background: rgba(74, 0, 23, 0.9);
-            padding: 15px;
+            background: rgba(74, 0, 23, 0.95);
+            padding: 14px;
             text-align: center;
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 22px;
+            font-family: 'Fredoka', cursive, sans-serif;
+            font-weight: 700;
             color: #ff3366;
             border-bottom: 2px solid #800020;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             flex-shrink: 0;
+            letter-spacing: 0.5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
         }
         .chat-box {
             flex: 1;
@@ -75,10 +82,10 @@ HTML_LAYOUT = """
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .input-area {
-            padding: 12px;
-            background: rgba(20, 5, 10, 0.95);
+            padding: 10px;
+            background: rgba(20, 5, 10, 0.98);
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             border-top: 1px solid #4a0017;
             flex-shrink: 0;
@@ -88,24 +95,24 @@ HTML_LAYOUT = """
             border: 1px solid #ff3366;
             color: white;
             border-radius: 50%;
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             flex-shrink: 0;
         }
         input {
             flex: 1;
-            padding: 12px 16px;
-            border-radius: 25px;
+            padding: 10px 14px;
+            border-radius: 20px;
             border: 1px solid #ff3366;
             background: rgba(30, 10, 15, 0.85);
             color: white;
             outline: none;
-            font-size: 16px; /* Touch devices Zoom prevention */
+            font-size: 16px;
         }
         input::placeholder {
             color: #bbbbbb;
@@ -114,11 +121,11 @@ HTML_LAYOUT = """
             background: #e6004c;
             color: white;
             border: none;
-            padding: 10px 22px;
-            border-radius: 25px;
+            padding: 10px 18px;
+            border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 14px;
             flex-shrink: 0;
             box-shadow: 0 2px 8px rgba(230,0,76,0.4);
         }
