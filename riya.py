@@ -4,15 +4,8 @@ from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
 
-# Aapki Groq API Key
-GROQ_API_KEY = "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"
-
-# Multiple models for auto-fallback if one is busy/unavailable
-AVAILABLE_MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "llama3-8b-8192"
-]
+# Nayi Updated Groq API Key
+GROQ_API_KEY = "Gsk_vELFdnYndldTmNEOXSa3WGdyb3FYw9DGd5MSfvbMI9IGPBtCut9C"
 
 HTML_LAYOUT = """
 <!DOCTYPE html>
@@ -212,10 +205,15 @@ def chat():
         "Content-Type": "application/json"
     }
 
+    models_to_try = [
+        "llama-3.1-8b-instant",
+        "llama-3.3-70b-versatile",
+        "llama3-8b-8192"
+    ]
+
     reply = None
 
-    # Loop through available models in case one fails
-    for model_name in AVAILABLE_MODELS:
+    for model_name in models_to_try:
         try:
             payload = {
                 "model": model_name,
@@ -229,12 +227,12 @@ def chat():
             
             if "choices" in res_json and len(res_json["choices"]) > 0:
                 reply = res_json['choices'][0]['message']['content']
-                break # Successful response obtained
+                break
         except Exception:
             continue
 
     if not reply:
-        reply = "Aapka message mila, par AI response mein temporary issue aa raha hai. Please dubara try karein."
+        reply = "Aapka message mila, par response nahi mil saka. Please dubara try karein."
 
     return jsonify({"reply": reply})
 
