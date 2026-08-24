@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
 
-# Aapki provided Groq API Key
+# Aapki Groq API Key
 GROQ_API_KEY = "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"
 
 HTML_LAYOUT = """
@@ -215,12 +215,14 @@ def chat():
         res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
         res_json = res.json()
         
-        if "choices" in res_json:
+        if "choices" in res_json and len(res_json["choices"]) > 0:
             reply = res_json['choices'][0]['message']['content']
+        elif "error" in res_json:
+            reply = f"API Error: {res_json['error']['message']}"
         else:
-            reply = f"API Error: {str(res_json)}"
+            reply = "Koi response nahi mila, dobara try karein."
     except Exception as e:
-        reply = f"Error: {str(e)}"
+        reply = f"System Error: {str(e)}"
         
     return jsonify({"reply": reply})
 
