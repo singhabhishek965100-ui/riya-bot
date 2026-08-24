@@ -4,7 +4,8 @@ import requests
 
 app = Flask(__name__)
 
-API_KEY = "AQ_Ab8RN6I9u1E1Aj0c_IXWiczvJSOIFz50pLeinc"
+# API Key and Gemini 1.5 Flash Endpoint
+API_KEY = "AQ.Ab8RN6K_wQ1QjWZuBKxYWNRRe3rCWZPicC43b0xjWHMoSfa7hw"
 URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
 
 HTML_LAYOUT = """
@@ -12,32 +13,42 @@ HTML_LAYOUT = """
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Riya AI Assistant</title>
-    <!-- Google Bubble Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html {
-            height: 100%;
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+            touch-action: manipulation;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             background: #000 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000') no-repeat center center fixed;
             background-size: cover;
             font-family: system-ui, -apple-system, sans-serif;
             color: white;
         }
+        /* Mobile-safe container using flexbox layout */
         .app-container {
             display: flex;
             flex-direction: column;
+            width: 100vw;
             height: 100vh;
+            height: 100dvh; /* Dynamic viewport height fix for mobile browsers */
             background: rgba(0, 0, 0, 0.65);
         }
         .header {
-            background: rgba(74, 0, 23, 0.95);
-            padding: 14px;
-            text-align: center;
+            height: 55px;
+            background: rgba(74, 0, 23, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
             font-family: 'Fredoka', cursive, sans-serif;
             font-weight: 700;
@@ -55,6 +66,7 @@ HTML_LAYOUT = """
             display: flex;
             flex-direction: column;
             gap: 12px;
+            -webkit-overflow-scrolling: touch;
         }
         .message {
             max-width: 85%;
@@ -80,6 +92,7 @@ HTML_LAYOUT = """
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .input-area {
+            height: 65px;
             padding: 10px;
             background: rgba(20, 5, 10, 0.98);
             display: flex;
@@ -110,7 +123,7 @@ HTML_LAYOUT = """
             background: rgba(30, 10, 15, 0.85);
             color: white;
             outline: none;
-            font-size: 15px;
+            font-size: 16px; /* 16px strictly stops mobile screen auto-zoom */
         }
         input::placeholder {
             color: #bbbbbb;
@@ -130,7 +143,7 @@ HTML_LAYOUT = """
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container" id="appContainer">
         <div class="header">🌹 Riya AI Assistant 🌹</div>
         <div class="chat-box" id="chat">
             <div class="message bot">Hello! Main Riya hoon. Kaise ho aap?</div>
@@ -144,6 +157,13 @@ HTML_LAYOUT = """
     </div>
 
     <script>
+        // Keeps keyboard open and adjusts viewport dynamically
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                document.getElementById('appContainer').style.height = window.visualViewport.height + 'px';
+            });
+        }
+
         async function sendMsg() {
             let input = document.getElementById('userInput');
             let text = input.value.trim();
@@ -151,7 +171,10 @@ HTML_LAYOUT = """
 
             let chat = document.getElementById('chat');
             chat.innerHTML += `<div class="message user">${text}</div>`;
+            
+            // Clear input without losing focus (keeps keyboard open)
             input.value = '';
+            input.focus();
             chat.scrollTop = chat.scrollHeight;
 
             try {
@@ -163,7 +186,7 @@ HTML_LAYOUT = """
                 let data = await res.json();
                 chat.innerHTML += `<div class="message bot">${data.reply}</div>`;
             } catch(e) {
-                chat.innerHTML += `<div class="message bot">Mafi chahti hoon, abhi network issue hai.</div>`;
+                chat.innerHTML += `<div class="message bot">Network error: Server disconnected.</div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
@@ -176,21 +199,22 @@ HTML_LAYOUT = """
 def home():
     return render_template_string(HTML_LAYOUT)
 
-@app.route('@chat' if False else '/chat', methods=['POST'])
+@app.route('/chat', methods=['POST'])
 def chat():
     data = request.get_json(force=True)
     user_prompt = data.get('prompt', '')
     
     payload = {"contents": [{"parts": [{"text": user_prompt}]}]}
     try:
-        r = requests.post(URL, json=payload)
+        r = requests.post(URL, json=payload, timeout=10)
         res_data = r.json()
         if 'candidates' in res_data:
             reply = res_data['candidates'][0]['content']['parts'][0]['text']
         else:
-            reply = f"API Error: {res_data.get('error', {}).get('message', 'Unknown error')}"
+            err_msg = res_data.get('error', {}).get('message', 'API connection failed')
+            reply = f"API Issue: {err_msg}"
     except Exception as e:
-        reply = f"Error: {str(e)}"
+        reply = f"Server Error: {str(e)}"
         
     return jsonify({"reply": reply})
 
