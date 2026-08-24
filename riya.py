@@ -1,7 +1,8 @@
 import requests
+import time
 
-API_KEY = "AQ.Ab8RN6I9u1E1AjOc_lXWiczvJSOlFz5DpLeincTS5B5StI-HrQ"
-URL = f"https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key={API_KEY}"
+API_KEY = "AQ_Ab8RN6I9u1E1Aj0c_IXWiczvJSOIFz5DpLeinc"
+URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
 
 headers = {"Content-Type": "application/json"}
 
@@ -10,14 +11,20 @@ print("     RIYA AI ASSISTANT ONLINE       ")
 print("====================================")
 
 while True:
-    user_input = input("\nAap: ")
+    try:
+        user_input = input("\nAap: ")
+    except EOFError:
+        print("Render Server Active (Waiting)...")
+        time.sleep(60)
+        continue
+
     if user_input.lower() in ["exit", "bye", "stop"]:
         print("Riya: Alvida! Phir milenge.")
         break
 
     payload = {
         "contents": [{
-            "parts": [{"text": f"Tumhara naam Riya hai. Tum ek smart AI assistant ho. Polite aur chote javab do. User: {user_input}"}]
+            "parts": [{"text": f"Tumhara naam Riya hai. User ne kaha: {user_input}"}]
         }]
     }
 
@@ -27,6 +34,6 @@ while True:
             reply = response.json()['candidates'][0]['content']['parts'][0]['text']
             print(f"Riya: {reply.strip()}")
         else:
-            print(f"Riya Error ({response.status_code}): {response.text}")
+            print(f"Riya Error ({response.status_code})")
     except Exception as e:
         print(f"Riya Error: {e}")
