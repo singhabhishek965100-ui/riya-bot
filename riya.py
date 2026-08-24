@@ -206,7 +206,7 @@ def chat():
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": "llama-3.1-8b-instant",
             "messages": [
                 {"role": "system", "content": "You are Riya, a friendly AI assistant who speaks in a sweet mix of Hindi and English (Hinglish)."},
                 {"role": "user", "content": user_prompt}
