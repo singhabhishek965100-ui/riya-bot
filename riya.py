@@ -21,8 +21,11 @@ HTML_LAYOUT = """
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
         html, body {
-            height: 100%;
-            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             background: #000 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000') no-repeat center center fixed;
             background-size: cover;
@@ -30,34 +33,42 @@ HTML_LAYOUT = """
             color: white;
         }
         .overlay {
-            background: rgba(0, 0, 0, 0.65);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-            position: relative;
-        }
-        .header {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            background: rgba(74, 0, 23, 0.95);
-            padding: 12px;
-            text-align: center;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 55px;
+            background: rgba(74, 0, 23, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
             font-family: 'Fredoka', cursive, sans-serif;
             font-weight: 700;
             color: #ff3366;
             border-bottom: 2px solid #800020;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            z-index: 10;
+            z-index: 1000;
             letter-spacing: 0.5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
         }
         .chat-box {
-            flex: 1;
-            padding: 70px 15px 15px 15px; /* Top padding diya hai taki messages header ke peeche na chupein */
+            position: absolute;
+            top: 55px;
+            bottom: 65px;
+            left: 0;
+            width: 100%;
+            padding: 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -87,14 +98,18 @@ HTML_LAYOUT = """
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65px;
             padding: 10px;
             background: rgba(20, 5, 10, 0.98);
             display: flex;
             gap: 6px;
             align-items: center;
             border-top: 1px solid #4a0017;
-            flex-shrink: 0;
-            z-index: 10;
+            z-index: 1000;
         }
         .icon-btn {
             background: #800020;
@@ -193,7 +208,7 @@ def chat():
     try:
         r = requests.post(URL, json=payload)
         res_data = r.json()
-        reply = r_data['candidates'][0]['content']['parts'][0]['text']
+        reply = res_data['candidates'][0]['content']['parts'][0]['text']
     except Exception as e:
         reply = "Mafi chahti hoon, response generate nahi ho pa raha."
         
