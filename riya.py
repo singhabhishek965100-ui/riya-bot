@@ -1,15 +1,11 @@
 import os
-import google.generativeai as genai
+import requests
 from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
 
-# Aapki AQ. se shuru hone wali valid API Key yahan hai
-API_KEY = "AQ.Ab8RN6K_wQ1QjWZuBKxYWNRRe3rCWZPicC43b0xjWHMoSfa7hw"
-genai.configure(api_key=API_KEY)
-
-# Model setup
-model = genai.GenerativeModel('gemini-2.5-flash')
+# Aapki provided Groq API Key
+GROQ_API_KEY = "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"
 
 HTML_LAYOUT = """
 <!DOCTYPE html>
@@ -205,10 +201,26 @@ def chat():
     user_prompt = data.get('prompt', '')
     
     try:
-        response = model.generate_content(user_prompt)
-        reply = response.text
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": [
+                {"role": "system", "content": "You are Riya, a friendly AI assistant who speaks in a sweet mix of Hindi and English (Hinglish)."},
+                {"role": "user", "content": user_prompt}
+            ]
+        }
+        res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload)
+        res_json = res.json()
+        
+        if "choices" in res_json:
+            reply = res_json['choices'][0]['message']['content']
+        else:
+            reply = f"API Error: {str(res_json)}"
     except Exception as e:
-        reply = f"API Error: {str(e)}"
+        reply = f"Error: {str(e)}"
         
     return jsonify({"reply": reply})
 
