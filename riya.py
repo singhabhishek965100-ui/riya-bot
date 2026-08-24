@@ -1,12 +1,12 @@
 import os
 from flask import Flask, request, jsonify, render_template_string
-import requests
+from google import genai
 
 app = Flask(__name__)
 
-# API Key and Gemini 1.5 Flash Endpoint
+# Official Gemini Client Setup
 API_KEY = "AQ.Ab8RN6K_wQ1QjWZuBKxYWNRRe3rCWZPicC43b0xjWHMoSfa7hw"
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+client = genai.Client(api_key=API_KEY)
 
 HTML_LAYOUT = """
 <!DOCTYPE html>
@@ -34,13 +34,12 @@ HTML_LAYOUT = """
             font-family: system-ui, -apple-system, sans-serif;
             color: white;
         }
-        /* Mobile-safe container using flexbox layout */
         .app-container {
             display: flex;
             flex-direction: column;
             width: 100vw;
             height: 100vh;
-            height: 100dvh; /* Dynamic viewport height fix for mobile browsers */
+            height: 100dvh;
             background: rgba(0, 0, 0, 0.65);
         }
         .header {
@@ -123,7 +122,7 @@ HTML_LAYOUT = """
             background: rgba(30, 10, 15, 0.85);
             color: white;
             outline: none;
-            font-size: 16px; /* 16px strictly stops mobile screen auto-zoom */
+            font-size: 16px;
         }
         input::placeholder {
             color: #bbbbbb;
@@ -157,7 +156,6 @@ HTML_LAYOUT = """
     </div>
 
     <script>
-        // Keeps keyboard open and adjusts viewport dynamically
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
                 document.getElementById('appContainer').style.height = window.visualViewport.height + 'px';
@@ -172,7 +170,6 @@ HTML_LAYOUT = """
             let chat = document.getElementById('chat');
             chat.innerHTML += `<div class="message user">${text}</div>`;
             
-            // Clear input without losing focus (keeps keyboard open)
             input.value = '';
             input.focus();
             chat.scrollTop = chat.scrollHeight;
@@ -204,17 +201,14 @@ def chat():
     data = request.get_json(force=True)
     user_prompt = data.get('prompt', '')
     
-    payload = {"contents": [{"parts": [{"text": user_prompt}]}]}
     try:
-        r = requests.post(URL, json=payload, timeout=10)
-        res_data = r.json()
-        if 'candidates' in res_data:
-            reply = res_data['candidates'][0]['content']['parts'][0]['text']
-        else:
-            err_msg = res_data.get('error', {}).get('message', 'API connection failed')
-            reply = f"API Issue: {err_msg}"
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=user_prompt,
+        )
+        reply = response.text
     except Exception as e:
-        reply = f"Server Error: {str(e)}"
+        reply = f"API Error: {str(e)}"
         
     return jsonify({"reply": reply})
 
