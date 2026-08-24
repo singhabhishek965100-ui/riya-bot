@@ -12,62 +12,44 @@ HTML_LAYOUT = """
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riya AI Assistant</title>
     <!-- Google Bubble Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
-        html, body {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            height: 100%;
+            margin: 0;
             background: #000 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000') no-repeat center center fixed;
             background-size: cover;
             font-family: system-ui, -apple-system, sans-serif;
             color: white;
         }
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.65);
+        .app-container {
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.65);
         }
         .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 55px;
-            background: rgba(74, 0, 23, 0.98);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: rgba(74, 0, 23, 0.95);
+            padding: 14px;
+            text-align: center;
             font-size: 20px;
             font-family: 'Fredoka', cursive, sans-serif;
             font-weight: 700;
             color: #ff3366;
             border-bottom: 2px solid #800020;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            z-index: 1000;
+            flex-shrink: 0;
             letter-spacing: 0.5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
         }
         .chat-box {
-            position: absolute;
-            top: 55px;
-            bottom: 65px;
-            left: 0;
-            width: 100%;
+            flex: 1;
             padding: 15px;
             overflow-y: auto;
             display: flex;
@@ -98,18 +80,13 @@ HTML_LAYOUT = """
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .input-area {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
             padding: 10px;
             background: rgba(20, 5, 10, 0.98);
             display: flex;
             gap: 6px;
             align-items: center;
             border-top: 1px solid #4a0017;
-            z-index: 1000;
+            flex-shrink: 0;
         }
         .icon-btn {
             background: #800020;
@@ -133,7 +110,7 @@ HTML_LAYOUT = """
             background: rgba(30, 10, 15, 0.85);
             color: white;
             outline: none;
-            font-size: 16px;
+            font-size: 15px;
         }
         input::placeholder {
             color: #bbbbbb;
@@ -153,7 +130,7 @@ HTML_LAYOUT = """
     </style>
 </head>
 <body>
-    <div class="overlay">
+    <div class="app-container">
         <div class="header">🌹 Riya AI Assistant 🌹</div>
         <div class="chat-box" id="chat">
             <div class="message bot">Hello! Main Riya hoon. Kaise ho aap?</div>
@@ -199,7 +176,7 @@ HTML_LAYOUT = """
 def home():
     return render_template_string(HTML_LAYOUT)
 
-@app.route('/chat', methods=['POST'])
+@app.route('@chat' if False else '/chat', methods=['POST'])
 def chat():
     data = request.get_json(force=True)
     user_prompt = data.get('prompt', '')
@@ -208,9 +185,12 @@ def chat():
     try:
         r = requests.post(URL, json=payload)
         res_data = r.json()
-        reply = res_data['candidates'][0]['content']['parts'][0]['text']
+        if 'candidates' in res_data:
+            reply = res_data['candidates'][0]['content']['parts'][0]['text']
+        else:
+            reply = f"API Error: {res_data.get('error', {}).get('message', 'Unknown error')}"
     except Exception as e:
-        reply = "Mafi chahti hoon, response generate nahi ho pa raha."
+        reply = f"Error: {str(e)}"
         
     return jsonify({"reply": reply})
 
