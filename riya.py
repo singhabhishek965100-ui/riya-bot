@@ -11,28 +11,131 @@ HTML_LAYOUT = """
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Riya AI Assistant</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
-        .header { background: #1e293b; padding: 15px; text-align: center; font-size: 20px; font-weight: bold; border-bottom: 1px solid #334155; }
-        .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 80%; padding: 10px 15px; border-radius: 12px; font-size: 15px; line-height: 1.4; }
-        .user { align-self: flex-end; background: #6366f1; color: white; }
-        .bot { align-self: flex-start; background: #334155; color: white; }
-        .input-area { padding: 10px; background: #1e293b; display: flex; gap: 10px; }
-        input { flex: 1; padding: 12px; border-radius: 8px; border: none; background: #0f172a; color: white; outline: none; }
-        button { background: #6366f1; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: #000 url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000') no-repeat center center fixed;
+            background-size: cover;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: white;
+        }
+        .overlay {
+            background: rgba(0, 0, 0, 0.65);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+        .header {
+            background: rgba(74, 0, 23, 0.9);
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff3366;
+            border-bottom: 2px solid #800020;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .user {
+            align-self: flex-end;
+            background: #800020;
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .bot {
+            align-self: flex-start;
+            background: rgba(40, 10, 20, 0.85);
+            color: #ffffff;
+            border: 1px solid #800020;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .input-area {
+            padding: 12px;
+            background: rgba(20, 5, 10, 0.95);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-top: 1px solid #4a0017;
+            flex-shrink: 0;
+        }
+        .icon-btn {
+            background: #800020;
+            border: 1px solid #ff3366;
+            color: white;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 25px;
+            border: 1px solid #ff3366;
+            background: rgba(30, 10, 15, 0.85);
+            color: white;
+            outline: none;
+            font-size: 16px; /* Touch devices Zoom prevention */
+        }
+        input::placeholder {
+            color: #bbbbbb;
+        }
+        .send-btn {
+            background: #e6004c;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(230,0,76,0.4);
+        }
     </style>
 </head>
 <body>
-    <div class="header">🤖 Riya AI Assistant</div>
-    <div class="chat-box" id="chat">
-        <div class="message bot">Namaste! Main Riya hoon. Aapki kya madad kar sakti hoon?</div>
-    </div>
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="Kuch bhi poochhein..." onkeypress="if(event.key==='Enter') sendMsg()">
-        <button onclick="sendMsg()">Send</button>
+    <div class="overlay">
+        <div class="header">🌹 Riya AI Assistant 🌹</div>
+        <div class="chat-box" id="chat">
+            <div class="message bot">Hello! Main Riya hoon. Kaise ho aap?</div>
+        </div>
+        <div class="input-area">
+            <button class="icon-btn">📎</button>
+            <input type="text" id="userInput" placeholder="Yahan likho..." onkeypress="if(event.key==='Enter') sendMsg()">
+            <button class="icon-btn">🎤</button>
+            <button class="send-btn" onclick="sendMsg()">Send</button>
+        </div>
     </div>
 
     <script>
@@ -46,13 +149,17 @@ HTML_LAYOUT = """
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
 
-            let res = await fetch('/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'json'},
-                body: JSON.stringify({prompt: text})
-            });
-            let data = await res.json();
-            chat.innerHTML += `<div class="message bot">${data.reply}</div>`;
+            try {
+                let res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt: text})
+                });
+                let data = await res.json();
+                chat.innerHTML += `<div class="message bot">${data.reply}</div>`;
+            } catch(e) {
+                chat.innerHTML += `<div class="message bot">Mafi chahti hoon, abhi network issue hai.</div>`;
+            }
             chat.scrollTop = chat.scrollHeight;
         }
     </script>
@@ -75,7 +182,7 @@ def chat():
         res_data = r.json()
         reply = res_data['candidates'][0]['content']['parts'][0]['text']
     except Exception as e:
-        reply = "Mafi chahti hoon, abhi response generate nahi ho pa raha."
+        reply = "Mafi chahti hoon, response generate nahi ho pa raha."
         
     return jsonify({"reply": reply})
 
