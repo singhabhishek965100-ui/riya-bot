@@ -33,26 +33,31 @@ HTML_LAYOUT = """
             background: rgba(0, 0, 0, 0.65);
             display: flex;
             flex-direction: column;
-            height: 100dvh;
-            width: 100vw;
+            height: 100%;
+            width: 100%;
+            position: relative;
         }
         .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             background: rgba(74, 0, 23, 0.95);
-            padding: 14px;
+            padding: 12px;
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-family: 'Fredoka', cursive, sans-serif;
             font-weight: 700;
             color: #ff3366;
             border-bottom: 2px solid #800020;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            flex-shrink: 0;
+            z-index: 10;
             letter-spacing: 0.5px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
         }
         .chat-box {
             flex: 1;
-            padding: 15px;
+            padding: 70px 15px 15px 15px; /* Top padding diya hai taki messages header ke peeche na chupein */
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -89,6 +94,7 @@ HTML_LAYOUT = """
             align-items: center;
             border-top: 1px solid #4a0017;
             flex-shrink: 0;
+            z-index: 10;
         }
         .icon-btn {
             background: #800020;
@@ -187,7 +193,7 @@ def chat():
     try:
         r = requests.post(URL, json=payload)
         res_data = r.json()
-        reply = res_data['candidates'][0]['content']['parts'][0]['text']
+        reply = r_data['candidates'][0]['content']['parts'][0]['text']
     except Exception as e:
         reply = "Mafi chahti hoon, response generate nahi ho pa raha."
         
