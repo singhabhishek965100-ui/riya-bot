@@ -4,8 +4,8 @@ from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
 
-# Nayi Updated Groq API Key
-GROQ_API_KEY = "Gsk_vELFdnYndldTmNEOXSa3WGdyb3FYw9DGd5MSfvbMI9IGPBtCut9C"
+# Updated Groq API Key
+GROQ_API_KEY = "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"
 
 HTML_LAYOUT = """
 <!DOCTYPE html>
@@ -201,38 +201,32 @@ def chat():
     user_prompt = data.get('prompt', '')
     
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {GROQ_API_KEY.strip()}",
         "Content-Type": "application/json"
     }
 
-    models_to_try = [
-        "llama-3.1-8b-instant",
-        "llama-3.3-70b-versatile",
-        "llama3-8b-8192"
-    ]
+    payload = {
+        "model": "llama-3.1-8b-instant",
+        "messages": [
+            {"role": "system", "content": "You are Riya, a friendly AI assistant who speaks in a sweet mix of Hindi and English (Hinglish). Keep answers short and sweet."},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 300
+    }
 
-    reply = None
-
-    for model_name in models_to_try:
-        try:
-            payload = {
-                "model": model_name,
-                "messages": [
-                    {"role": "system", "content": "You are Riya, a friendly AI assistant who speaks in a sweet mix of Hindi and English (Hinglish). Keep responses concise and engaging."},
-                    {"role": "user", "content": user_prompt}
-                ]
-            }
-            res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=10)
-            res_json = res.json()
-            
-            if "choices" in res_json and len(res_json["choices"]) > 0:
-                reply = res_json['choices'][0]['message']['content']
-                break
-        except Exception:
-            continue
-
-    if not reply:
-        reply = "Aapka message mila, par response nahi mil saka. Please dubara try karein."
+    try:
+        res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=10)
+        res_json = res.json()
+        
+        if "choices" in res_json and len(res_json["choices"]) > 0:
+            reply = res_json['choices'][0]['message']['content']
+        elif "error" in res_json:
+            reply = f"Groq Error: {res_json['error'].get('message', 'API Error')}"
+        else:
+            reply = "Koi error aaya, please fir se try karein."
+    except Exception as e:
+        reply = f"Server Connection Error: {str(e)}"
 
     return jsonify({"reply": reply})
 
